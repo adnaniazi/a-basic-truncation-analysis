@@ -95,8 +95,15 @@ if __name__ == '__main__':
         os.system('rm bc10_fast5_data_msgpack_df')
 
     # read directories
+
+    # # Uncomment for Barcode10 analysis
+    # bc10_fast5_dir = '/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/' \
+    #                  '20180710_1431_197_lig/backbone_aligned_reads/pass/barcode10_all_reads'
+
+    # Uncomment for Barcode08 analysis
     bc10_fast5_dir = '/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/' \
-                     '20180710_1431_197_lig/backbone_aligned_reads/pass/barcode10_all_reads'
+                     '20180710_1431_197_lig/backbone_aligned_reads/pass/barcode08_all_reads'
+
     uncl_fast5_dir = '/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/' \
                      '20180710_1431_197_lig/backbone_aligned_reads/pass/unclassified_all_reads'
 
