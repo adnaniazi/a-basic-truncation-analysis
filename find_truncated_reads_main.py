@@ -343,9 +343,7 @@ if __name__ == '__main__':
     print('Number of read fragments coming from unclassified: {0}'.format(fragments_df.sam_data_class.value_counts()['unclassified']))
     print('Number of read fragments coming from barcode10: {0}'.format(fragments_df.sam_data_class.value_counts()['barcode10']))
 
-    # Total
 
-    pass
 
 
 
