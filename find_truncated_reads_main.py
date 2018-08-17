@@ -247,35 +247,30 @@ if __name__ == '__main__':
     neg_strand_data = neg_strand_data.sort_values('read_start_time')
 
     # 3. Get channel wise data
-    gap_threshold = 1
+    gap_threshold = 4
 
     channel_wise_dict_pos_strand = {}
     channel_wise_dict_neg_strand = {}
 
     for ch in range(1, 512+1):
+        print('processing channel {0} of 512 channels (+ strands)'.format(ch))
         channel_wise_data_df_pos_strand = pd.DataFrame(columns=['read_start_time', 'read_end_time', 'sampling_rate',
                                                                 'read_id', 'read_number', 'channel_id',
                                                                 'fast5_sequence_length', 'class', 'strand',
                                                                 'alignment_start_position', 'mapping_quality',
                                                                 'sam_data_class', 'alignment_length'])
-        channel_wise_data_df_neg_strand = channel_wise_data_df_pos_strand
 
         pos_strand_ch_wise_data = pos_strand_data[pos_strand_data.channel_id == ch].sort_values('read_start_time')
-        neg_strand_ch_wise_data = neg_strand_data[neg_strand_data.channel_id == ch].sort_values('read_start_time')
-
         pos_strand_ch_wise_data_numrows = pos_strand_ch_wise_data.shape[0]
-        neg_strand_ch_wise_data_numrows = neg_strand_ch_wise_data.shape[0]
 
-        pos_strand_truncated_reads_tuples_list = []
         for i in range(pos_strand_ch_wise_data_numrows-1):
             # check for two things
             # 1. is alignment of the two fragments back-to-back in time
             # 2. is the start position of the end fragment after the end position of the first fragment in terms of alignment
-
-            if (pos_strand_ch_wise_data.iloc[i+1]['read_start_time'] - pos_strand_ch_wise_data.iloc[i]['read_end_time'] < gap_threshold) \
+            if (abs(pos_strand_ch_wise_data.iloc[i+1]['read_start_time'] - pos_strand_ch_wise_data.iloc[i]['read_end_time']) < gap_threshold) \
                     and (int(pos_strand_ch_wise_data.iloc[i+1]['alignment_start_position']) > int(pos_strand_ch_wise_data.iloc[i]['alignment_start_position'])+pos_strand_ch_wise_data.iloc[i]['alignment_length']):
-                channel_wise_data_df_pos_strand = channel_wise_data_df_pos_strand.append(pos_strand_ch_wise_data.iloc[channel_wise_data_df_pos_strand.shape[0]], ignore_index=True)
-                channel_wise_data_df_pos_strand = channel_wise_data_df_pos_strand.append(pos_strand_ch_wise_data.iloc[channel_wise_data_df_pos_strand.shape[0]+1], ignore_index=True)
+                channel_wise_data_df_pos_strand = channel_wise_data_df_pos_strand.append(pos_strand_ch_wise_data.iloc[i], ignore_index=False)
+                channel_wise_data_df_pos_strand = channel_wise_data_df_pos_strand.append(pos_strand_ch_wise_data.iloc[i+1], ignore_index=False)
         # Remove duplicates
         channel_wise_data_df_pos_strand = channel_wise_data_df_pos_strand.drop_duplicates(keep='first')
         # Sort time wise
@@ -283,27 +278,74 @@ if __name__ == '__main__':
         channel_wise_dict_pos_strand[str(ch)] = channel_wise_data_df_pos_strand
 
 
-    # 4. For every channel filter the rows according to the gap threshold
-    # (unit seconds) anything greater than this threshold should be treated as an untruncated read
-    gap_threshold = 4
+    for ch in range(1, 512+1):
+        print('processing channel {0} of 512 channels (- strands)'.format(ch))
+        channel_wise_data_df_neg_strand = pd.DataFrame(columns=['read_start_time', 'read_end_time', 'sampling_rate',
+                                                                'read_id', 'read_number', 'channel_id',
+                                                                'fast5_sequence_length', 'class', 'strand',
+                                                                'alignment_start_position', 'mapping_quality',
+                                                                'sam_data_class', 'alignment_length'])
 
-    truncated_reads_tuples_list = []
-    for i in range(len(start_end_tuples_list)-1):
-        if (start_end_tuples_list[i+1][0] - start_end_tuples_list[i][1]) < gap_threshold:
-            truncated_reads_tuples_list.append(start_end_tuples_list[i])
-            truncated_reads_tuples_list.append(start_end_tuples_list[i+1])
-    truncated_reads_tuples_list = sorted(list(set(truncated_reads_tuples_list)))
-    truncated_reads_tuples_list
+        neg_strand_ch_wise_data = neg_strand_data[neg_strand_data.channel_id == ch].sort_values('read_start_time')
+
+        neg_strand_ch_wise_data_numrows = neg_strand_ch_wise_data.shape[0]
+
+        for i in range(neg_strand_ch_wise_data_numrows-1):
+            # check for two things
+            # 1. is alignment of the two fragments back-to-back in time
+            # 2. is the start position of the end fragment after the end position of the first fragment in terms of alignment
+
+            if (abs(neg_strand_ch_wise_data.iloc[i+1]['read_start_time'] - neg_strand_ch_wise_data.iloc[i]['read_end_time']) < gap_threshold) \
+                    and (int(neg_strand_ch_wise_data.iloc[i+1]['alignment_start_position'])+neg_strand_ch_wise_data.iloc[i+1]['alignment_length'] < int(neg_strand_ch_wise_data.iloc[i]['alignment_start_position'])):
+                channel_wise_data_df_neg_strand = channel_wise_data_df_neg_strand.append(neg_strand_ch_wise_data.iloc[i], ignore_index=False)
+                channel_wise_data_df_neg_strand = channel_wise_data_df_neg_strand.append(neg_strand_ch_wise_data.iloc[i+1], ignore_index=False)
+        # Remove duplicates
+        channel_wise_data_df_neg_strand = channel_wise_data_df_neg_strand.drop_duplicates(keep='first')
+        # Sort time wise
+        channel_wise_data_df_neg_strand = channel_wise_data_df_neg_strand.sort_values('read_start_time')
+        channel_wise_dict_neg_strand[str(ch)] = channel_wise_data_df_neg_strand
+
+    # ------------------------------------------------------ #
+    # ---------------- RESULTS/STATISTICS ------------------ #
+    # ------------------------------------------------------ #
+
+    # Fragmented reads count
+    fragment_reads_count = 0
+    fragments_df = pd.DataFrame(columns=['read_start_time', 'read_end_time', 'sampling_rate',
+                                         'read_id', 'read_number', 'channel_id',
+                                         'fast5_sequence_length', 'class', 'strand',
+                                         'alignment_start_position', 'mapping_quality',
+                                         'sam_data_class', 'alignment_length'])
+    for ch in range(1, 512+1):
+        pos_ch_df = channel_wise_dict_pos_strand[str(ch)]
+        neg_ch_df = channel_wise_dict_neg_strand[str(ch)]
+
+        if not(pos_ch_df.empty):
+            for i in range(pos_ch_df.shape[0]-1):
+                fragments_df = fragments_df.append(pos_ch_df.iloc[i], ignore_index=False)
+                if (pos_ch_df.iloc[i+1]['read_start_time'] - pos_ch_df.iloc[i]['read_end_time']) > gap_threshold:
+                    fragment_reads_count += 1
+            fragment_reads_count += 1
+            fragments_df = fragments_df.append(pos_ch_df.iloc[i+1], ignore_index=False)
+
+        if not(neg_ch_df.empty):
+            for i in range(neg_ch_df.shape[0]-1):
+                fragments_df = fragments_df.append(neg_ch_df.iloc[i], ignore_index=False)
+                if (neg_ch_df.iloc[i+1]['read_start_time'] - neg_ch_df.iloc[i]['read_end_time']) > gap_threshold:
+                    fragment_reads_count += 1
+            fragment_reads_count += 1
+            fragments_df = fragments_df.append(neg_ch_df.iloc[i+1], ignore_index=False)
+
+    print('Total number of unclassifed reads: {0}'.format(uncl_df.shape[0]))
+    print('Total number of barcode10(DMS treated and made abasic) reads: {0}'.format(bc10_df.shape[0]))
+    print('Combined total of unclassified and barcode10 reads: {0}'.format(uncl_df.shape[0]+bc10_df.shape[0]))
+    print('Total number of longer reads found by combining fragments: {0}'.format(fragment_reads_count))
+    print('Number of read fragments coming from unclassified: {0}'.format(fragments_df.sam_data_class.value_counts()['unclassified']))
+    print('Number of read fragments coming from barcode10: {0}'.format(fragments_df.sam_data_class.value_counts()['barcode10']))
+
+    # Total
+
+    pass
 
 
-    print('bull')
 
-
-
-# truncated_reads_tuples_list = []
-# for i in range(len(start_end_tuples_list)-1):
-#     if (start_end_tuples_list[i+1][0] - start_end_tuples_list[i][1]) < gap_threshold:
-#         truncated_reads_tuples_list.append(start_end_tuples_list[i])
-#         truncated_reads_tuples_list.append(start_end_tuples_list[i+1])
-# truncated_reads_tuples_list = sorted(list(set(truncated_reads_tuples_list)))
-# truncated_reads_tuples_list
