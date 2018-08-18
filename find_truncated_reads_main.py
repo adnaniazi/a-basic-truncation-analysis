@@ -151,7 +151,8 @@ if __name__ == '__main__':
     # ------------------------------------------------------ #
     # -------------- SAMFILE DATA PROCESSING --------------- #
     # ------------------------------------------------------ #
-    BC10_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode10_ecorv_backbone_only/aln.sam')
+    #BC10_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode10_ecorv_backbone_only/aln.sam')
+    BC10_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode08_ecorv_backbone_only/aln.sam')
     UNCL_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/unclassified_ecorv_backbone_only/aln.sam')
     SAM_TESTMODE = False
     REMOVE_SAM_DATAFRAME_FILES = False
