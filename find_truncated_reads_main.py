@@ -84,7 +84,7 @@ def find_all_fast5s(directory):
 if __name__ == '__main__':
 
     TESTMODE = False
-    REMOVE_DATAFRAME_FILES = False
+    REMOVE_DATAFRAME_FILES = True
 
     # ------------------------------------------------------ #
     # --------------- FAST5 DATA PROCESSING ---------------- #
@@ -101,10 +101,10 @@ if __name__ == '__main__':
     #                  '20180710_1431_197_lig/backbone_aligned_reads/pass/barcode10_all_reads'
 
     # Uncomment for Barcode08 analysis
-    bc10_fast5_dir = '/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/' \
+    bc10_fast5_dir = '/export/valenfs/data/processed_data/MinION/' \
                      '20180710_1431_197_lig/backbone_aligned_reads/pass/barcode08_all_reads'
 
-    uncl_fast5_dir = '/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/' \
+    uncl_fast5_dir = '/export/valenfs/data/processed_data/MinION/' \
                      '20180710_1431_197_lig/backbone_aligned_reads/pass/unclassified_all_reads'
 
     # if fast5 dataframes don't exist, then read the fast5, make dataframes, and save them in the current dir
@@ -152,10 +152,10 @@ if __name__ == '__main__':
     # -------------- SAMFILE DATA PROCESSING --------------- #
     # ------------------------------------------------------ #
     #BC10_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode10_ecorv_backbone_only/aln.sam')
-    BC10_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode08_ecorv_backbone_only/aln.sam')
-    UNCL_SAM_FILE_PATH = os.path.join('/Users/adnaniazi/mnt/kjempetuja/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/unclassified_ecorv_backbone_only/aln.sam')
+    BC10_SAM_FILE_PATH = os.path.join('/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/barcode08_ecorv_backbone_only/aln.sam')
+    UNCL_SAM_FILE_PATH = os.path.join('/export/valenfs/data/processed_data/MinION/20180710_1431_197_lig/alignment_to_plasmid/unclassified_ecorv_backbone_only/aln.sam')
     SAM_TESTMODE = False
-    REMOVE_SAM_DATAFRAME_FILES = False
+    REMOVE_SAM_DATAFRAME_FILES = True
 
     if REMOVE_SAM_DATAFRAME_FILES:
         os.system('rm uncl_sam_data_msgpack_df')
