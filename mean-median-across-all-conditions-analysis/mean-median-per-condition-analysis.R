@@ -30,16 +30,6 @@ if (mac_linux == 'Darwin'){
 
 
 source('find_mean_median.R')
-source('find_mean_median_parallel.R')
-
-ls3 = find_mean_median_parallel(bc08_fast5_list, mac_linux)
-
-
-# make an dataframe
-N <- max(length(bc08_fast5_list), length(bc09_fast5_list), length(bc10_fast5_list))
-df <- data.frame(bc08_mean = numeric(N), bc08_median = numeric(N),
-                 bc09_mean = numeric(N), bc09_median = numeric(N),
-                 bc10_mean = numeric(N), bc10_median = numeric(N))
 
 # fill the data frame
 i = 0
@@ -81,7 +71,7 @@ registerDoParallel(cl)
 strt<-Sys.time()
 
 #loop
-ls<-foreach(filepath = bc09_fast5_list) %dopar% {
+ls<-foreach(filepath = bc08_fast5_list) %dopar% {
     tryCatch({
         if (mac_linux == 'Linux'){
             read_data <- extract_read_data_rhdf5(filepath)
@@ -174,4 +164,59 @@ ls3<-foreach(filepath = bc10_fast5_list) %dopar% {
 }
 stopCluster(cl)
 ls3
+
+####################################
+### FURTHER PROCESSING OF LISTS ###
+####################################
+save(ls, ls2, ls3, file = 'mean_median_data.RData')
+
+bc08_mean <- unlist(sapply(ls, function(x) x[1]))
+bc08_median <- unlist(sapply(ls, function(x) x[2]))
+bc09_mean <- unlist(sapply(ls2, function(x) x[1]))
+bc09_median <- unlist(sapply(ls2, function(x) x[2]))
+bc10_mean <- unlist(sapply(ls3, function(x) x[1]))
+bc10_median <- unlist(sapply(ls3, function(x) x[2]))
+
+names(bc08_mean) <- NULL
+names(bc09_mean) <- NULL
+names(bc10_mean) <- NULL
+
+names(bc08_median) <- NULL
+names(bc09_median) <- NULL
+names(bc10_median) <- NULL
+
+# make a dataframe of all this data
+maxlength <- max(length(bc08_mean), length(bc09_mean), length(bc10_mean))
+length(bc08_mean) <- maxlength
+length(bc09_mean) <- maxlength
+length(bc10_mean) <- maxlength
+
+length(bc08_median) <- maxlength
+length(bc09_median) <- maxlength
+length(bc10_median) <- maxlength
+
+# replace all zeros by NAs
+bc08_mean[bc08_mean==0] <- NA
+bc09_mean[bc09_mean==0] <- NA
+bc10_mean[bc10_mean==0] <- NA
+
+bc08_median[bc08_median==0] <- NA
+bc09_median[bc09_median==0] <- NA
+bc10_median[bc10_median==0] <- NA
+
+df = data.frame(bc08_mean, bc09_mean, bc10_mean,
+                bc08_median, bc09_median, bc10_median)
+
+####################################
+############## PLOTTING OF DF ######
+####################################
+library(ggplot2)
+df2 = stack(df)
+
+ggplot(data = df2, aes(x = ind, y=values))+
+    geom_violin()
+
+
+
+
 
