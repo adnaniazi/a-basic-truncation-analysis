@@ -1,31 +1,22 @@
-Extract for each read the mean and median of the signal level (or any other factor used by Tombo/Albacore to normalise raw data) and plot the distribution of median per read as a box plot/violin plot comparing the three treatments (untreated, DMS, abasic)
+2. State model distribution and state speed distribution.
+	Mine all data
+	record for each state all occurring measurements (as raw data points (not means) and normalised raw data)
+	record for each state all occurring lengths to next move
+	plot “length to next move” for each state as a violin plot for the three different treatments
 
-Date 17 Aug 2016
-Dataset: DMS lig
+Strategy:
+=========
+# do it for the minimum number of reads of all three datasets:
+
+Returns
+- a data structure for raw data per state,
+- a data structure for for pA normalized raw data per state,
+- a data structure for normalized data per state,
+- data structure for stay length per state
 
 
-Recipe:
-1. Will do it in R
-2. Collect raw data from all reads one by ones 
-3. Only use data which is actually basecalled from the base calling start position
-4. pa-normalize the data, and median normalize the data
-5. calculate mean and median for pa-normalized and median normalized data
-6. collect the mean and median for both normalization
 
-pa_norm_mean_bc08
-pa_norm_median_bc08
+joy plot for plotting all of them overlayed on one another
 
-pa_norm_mean_bc09
-pa_norm_median_bc09
 
-pa_norm_mean_bc10
-pa_norm_median_bc10
 
-md_norm_mean_bc08
-md_norm_median_bc08
-
-md_norm_mean_bc09
-md_norm_median_bc09
-
-md_norm_mean_bc10
-md_norm_median_bc10
